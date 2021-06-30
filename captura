@@ -1,0 +1,32 @@
+#!/bin/sh
+# program
+## identify available screens
+screens=$(xrandr --listactivemonitors | cut -d' ' -f6)
+
+## prompt user to select the area
+chosen=$(echo -e "Hacksaw\nwhole desktop\n$screens" | dmenu -i -p "Select area to screenshot")
+echo $chosen
+
+## get the area
+case "$chosen" in
+    Hacksaw) area=$(hacksaw);;
+
+    "whole desktop") ;;
+
+    *) area=$(xrandr | grep "$chosen" | cut -d' ' -f3)
+       if [ $area == 'primary' ]
+       then
+           area=$(xrandr | grep "$chosen" | cut -d' ' -f4)
+       fi;;
+esac
+
+echo $area
+
+## take screenshot
+file=$HOME/.cache/rifle/$(date +%Y%m%d-%H%M%S.png)
+shotgun -g $area $file
+
+chosen=$(echo -e "Both\nClipboard\nFile" | dmenu -i -p "Save to:")
+echo $chosen
+
+xclip -t 'image/png' -selection clipboard $file
