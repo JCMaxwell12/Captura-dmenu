@@ -1,17 +1,23 @@
 #!/bin/sh
-# program
+
+
+savepath=$HOME/.cache/captura/
+filename=$(date +%Y%m%d-%H%M%S.png)
+
+##make sure savepath exists
+
+
 ## identify available screens
 screens=$(xrandr --listactivemonitors | cut -d' ' -f6)
 
 ## prompt user to select the area
 chosen=$(echo -e "Hacksaw\nwhole desktop\n$screens" | dmenu -i -p "Select area to screenshot")
-echo $chosen
 
 ## get the area
 case "$chosen" in
     Hacksaw) area=$(hacksaw);;
 
-    "whole desktop") ;;
+    "whole desktop") area=None;;
 
     *) area=$(xrandr | grep "$chosen" | cut -d' ' -f3)
        if [ $area == 'primary' ]
@@ -20,13 +26,20 @@ case "$chosen" in
        fi;;
 esac
 
-echo $area
-
 ## take screenshot
-file=$HOME/.cache/rifle/$(date +%Y%m%d-%H%M%S.png)
-shotgun -g $area $file
+file=$savepath/$filename
+
+if [ $area = None ]
+then
+    shotgun $file
+else
+    shotgun -g $area $file
+fi
 
 chosen=$(echo -e "Both\nClipboard\nFile" | dmenu -i -p "Save to:")
-echo $chosen
 
-xclip -t 'image/png' -selection clipboard $file
+case "$chosen" in
+    Both) xclip -selection Clipboard -t 'image/png' $file;;
+    Clipboard) xclip -selection Clipboard -t 'image/png' $file && rm $file;;
+    File) echo Saved to "$file";;
+esac
