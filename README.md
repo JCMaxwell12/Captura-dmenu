@@ -1,2 +1,2 @@
-# rifle
-Dmenu screenshot utility
+# Captura
+Dmenu screenshot script using Shotgun and Hacksaw
