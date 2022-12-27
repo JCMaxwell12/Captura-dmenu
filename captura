@@ -1,12 +1,14 @@
 #!/bin/sh
 
 
-savepath=$HOME/.cache/captura/
+savepath=$HOME/Pictures/Screenshots/
 filename=$(date +%Y%m%d-%H%M%S.png)
 
 ##make sure savepath exists
-
-
+if [[ ! -f $savepath ]]
+then
+    mkdir -p $savepath
+fi
 ## identify available screens
 screens=$(xrandr --listactivemonitors | cut -d' ' -f6)
 
@@ -28,7 +30,7 @@ esac
 
 ## take screenshot
 file=$savepath/$filename
-
+sleep 0.05
 if [ $area = None ]
 then
     shotgun $file
